@@ -12,6 +12,7 @@ const key = {
   stats: (postId: string) => `hive:${postId}:stats`,
   streak: (userId: string) => `hive:user:${userId}:streak`,
   byNumber: 'hive:byNumber',
+  custom: (postId: string) => `hive:${postId}:custom`,
 };
 
 export const reserveSpectrum = async () => {
@@ -20,13 +21,30 @@ export const reserveSpectrum = async () => {
   return { index, number, spectrum: spectrumAt(index) };
 };
 
-export const bindSpectrum = async (postId: string, index: number, number: number) => {
+export const postIdByNumber = async (number: number) =>
+  redis.hGet(key.byNumber, String(number));
+
+export const bindSpectrum = async (
+  postId: string,
+  index: number,
+  number: number,
+  custom?: Spectrum
+) => {
+  if (custom) await redis.set(key.custom(postId), JSON.stringify(custom));
   await redis.set(key.spectrum(postId), String(index));
   await redis.set(key.number(postId), String(number));
   await redis.hSet(key.byNumber, { [String(number)]: postId });
 };
 
 const spectrumFor = async (postId: string): Promise<Spectrum> => {
+  const customRaw = await redis.get(key.custom(postId));
+  if (customRaw) {
+    try {
+      return JSON.parse(customRaw) as Spectrum;
+    } catch {
+      /* fall through to the built-in spectrum */
+    }
+  }
   const raw = await redis.get(key.spectrum(postId));
   const parsed = Number(raw ?? NaN);
   return spectrumAt(Number.isFinite(parsed) ? parsed : hashIndex(postId));

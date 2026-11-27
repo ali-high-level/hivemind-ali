@@ -3,6 +3,7 @@ export type Spectrum = {
   title: string;
   left: string;
   right: string;
+  by?: string;
 };
 
 export type MyGuess = {
