@@ -6,6 +6,6 @@ export const createPost = async () => {
   const post = await reddit.submitCustomPost({
     title: `Hivemind #${number}: ${spectrum.title}`,
   });
-  await bindSpectrum(post.id, index);
+  await bindSpectrum(post.id, index, number);
   return post;
 };

@@ -1,15 +1,17 @@
 import { redis } from '@devvit/web/server';
-import type { MyGuess, Spectrum, StateResponse } from '../../shared/api';
+import type { MyGuess, Spectrum, StateResponse, Yesterday } from '../../shared/api';
 import { hashIndex, spectrumAt } from './spectra';
 
 export const BUCKETS = 20;
 
 const key = {
   spectrum: (postId: string) => `hive:${postId}:spectrum`,
+  number: (postId: string) => `hive:${postId}:number`,
   guesses: (postId: string) => `hive:${postId}:guesses`,
   buckets: (postId: string) => `hive:${postId}:buckets`,
   stats: (postId: string) => `hive:${postId}:stats`,
   streak: (userId: string) => `hive:user:${userId}:streak`,
+  byNumber: 'hive:byNumber',
 };
 
 export const reserveSpectrum = async () => {
@@ -18,8 +20,10 @@ export const reserveSpectrum = async () => {
   return { index, number, spectrum: spectrumAt(index) };
 };
 
-export const bindSpectrum = async (postId: string, index: number) => {
+export const bindSpectrum = async (postId: string, index: number, number: number) => {
   await redis.set(key.spectrum(postId), String(index));
+  await redis.set(key.number(postId), String(number));
+  await redis.hSet(key.byNumber, { [String(number)]: postId });
 };
 
 const spectrumFor = async (postId: string): Promise<Spectrum> => {
@@ -48,17 +52,42 @@ const bumpStreak = async (userId: string) => {
   });
 };
 
+const yesterdayFor = async (postId: string): Promise<Yesterday | null> => {
+  const raw = await redis.get(key.number(postId));
+  const num = Number(raw ?? NaN);
+  if (!Number.isFinite(num) || num < 2) return null;
+
+  const prevId = await redis.hGet(key.byNumber, String(num - 1));
+  if (!prevId) return null;
+
+  const [spectrum, stats] = await Promise.all([
+    spectrumFor(prevId),
+    redis.hGetAll(key.stats(prevId)),
+  ]);
+  const n = Number(stats.n ?? 0);
+  if (n === 0) return null;
+
+  return {
+    title: spectrum.title,
+    left: spectrum.left,
+    right: spectrum.right,
+    mean: Number(stats.sum ?? 0) / n,
+    total: n,
+  };
+};
+
 export const loadState = async (
   postId: string,
   userId: string | undefined,
   username: string
 ): Promise<StateResponse> => {
-  const [spectrum, bucketHash, stats, rawGuess, streakHash] = await Promise.all([
+  const [spectrum, bucketHash, stats, rawGuess, streakHash, yesterday] = await Promise.all([
     spectrumFor(postId),
     redis.hGetAll(key.buckets(postId)),
     redis.hGetAll(key.stats(postId)),
     userId ? redis.hGet(key.guesses(postId), userId) : Promise.resolve(undefined),
     userId ? redis.hGetAll(key.streak(userId)) : Promise.resolve({} as Record<string, string>),
+    yesterdayFor(postId),
   ]);
 
   const buckets = Array.from({ length: BUCKETS }, (_, i) => Number(bucketHash[String(i)] ?? 0));
@@ -90,6 +119,7 @@ export const loadState = async (
       current: Number(streakHash.count ?? 0),
       best: Number(streakHash.best ?? 0),
     },
+    yesterday,
   };
 };
 
