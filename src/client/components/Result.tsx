@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import { JoinButton } from './Join';
 import type { StateResponse } from '../../shared/api';
 
 const leaning = (mean: number, left: string, right: string) => {
@@ -76,6 +77,8 @@ export const Result = ({ state }: { state: StateResponse }) => {
           </div>
         </div>
       )}
+
+      <JoinButton />
 
       <div className="hv-chips">
         <span className="hv-chip">

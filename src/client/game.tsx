@@ -54,7 +54,7 @@ export const App = () => {
           <p className="hv-kicker">1 of 2 · Your take</p>
           <h1 className="hv-q">{spectrum.title}</h1>
         {spectrum.by && <p className="hv-by">Spectrum by u/{spectrum.by}</p>}
-          <p className="hv-sub">Where do you stand?</p>
+          <p className="hv-sub">Drag to where you stand. Next, you will predict the crowd.</p>
         </div>
         <SpectrumSlider
           value={opinion}

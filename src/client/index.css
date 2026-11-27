@@ -432,3 +432,10 @@ body {
 .hv-splash .hv-btn {
   align-self: stretch;
 }
+
+.hv-join {
+  flex: none;
+  align-self: flex-start;
+  padding: 10px 16px;
+  font-size: 14px;
+}

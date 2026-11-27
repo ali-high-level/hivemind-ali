@@ -17,7 +17,7 @@ export const Splash = () => {
           <Mark />
           HIVEMIND
         </div>
-        <span className="hv-date">Daily</span>
+        <span className="hv-date">{new Date().toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span>
       </header>
 
       <div>
