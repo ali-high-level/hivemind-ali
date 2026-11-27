@@ -53,6 +53,7 @@ export const App = () => {
         <div>
           <p className="hv-kicker">1 of 2 · Your take</p>
           <h1 className="hv-q">{spectrum.title}</h1>
+        {spectrum.by && <p className="hv-by">Spectrum by u/{spectrum.by}</p>}
           <p className="hv-sub">Where do you stand?</p>
         </div>
         <SpectrumSlider
@@ -76,6 +77,7 @@ export const App = () => {
       <div>
         <p className="hv-kicker">2 of 2 · Read the crowd</p>
         <h1 className="hv-q">{spectrum.title}</h1>
+        {spectrum.by && <p className="hv-by">Spectrum by u/{spectrum.by}</p>}
         <p className="hv-sub">Now guess: where will everyone else land, on average?</p>
       </div>
       <SpectrumSlider

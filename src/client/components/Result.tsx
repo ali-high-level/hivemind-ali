@@ -26,6 +26,7 @@ export const Result = ({ state }: { state: StateResponse }) => {
           The hive speaks · {total} {total === 1 ? 'player' : 'players'}
         </p>
         <h1 className="hv-q">{spectrum.title}</h1>
+        {spectrum.by && <p className="hv-by">Spectrum by u/{spectrum.by}</p>}
       </div>
 
       <div className="hv-score">
@@ -81,7 +82,7 @@ export const Result = ({ state }: { state: StateResponse }) => {
           <b>{streak.current}</b> day streak
         </span>
         <span className="hv-chip">Best {streak.best}</span>
-        <span className="hv-chip muted">New spectrum tomorrow. Defend your take in the comments.</span>
+        <span className="hv-chip muted">Tomorrow is yours: reply on this post with Title | Left | Right</span>
       </div>
     </>
   );
