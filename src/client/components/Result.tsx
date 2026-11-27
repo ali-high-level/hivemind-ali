@@ -1,6 +1,37 @@
+import { useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
-import { JoinButton } from './Join';
 import type { StateResponse } from '../../shared/api';
+import { JoinButton } from './Join';
+
+const useCountUp = (target: number, ms = 900) => {
+  const reduce =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const [value, setValue] = useState(reduce ? target : 0);
+
+  useEffect(() => {
+    if (reduce) return;
+    let raf = 0;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / ms);
+      setValue(Math.round(target * (1 - Math.pow(1 - t, 3))));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, ms, reduce]);
+
+  return reduce ? target : value;
+};
+
+const tierFor = (score: number) => {
+  if (score >= 90) return 'Mind reader';
+  if (score >= 75) return 'In sync';
+  if (score >= 55) return 'Close call';
+  if (score >= 35) return 'Off the mark';
+  return 'Different wavelength';
+};
 
 const leaning = (mean: number, left: string, right: string) => {
   if (mean >= 58) return `leaning “${right}”`;
@@ -10,6 +41,7 @@ const leaning = (mean: number, left: string, right: string) => {
 
 export const Result = ({ state }: { state: StateResponse }) => {
   const { spectrum, buckets, total, mean, myGuess, score, streak, yesterday } = state;
+  const shownScore = useCountUp(score ?? 0);
   if (!myGuess || mean === null) return null;
 
   const max = Math.max(1, ...buckets);
@@ -19,6 +51,16 @@ export const Result = ({ state }: { state: StateResponse }) => {
   let insight = `You sit ${Math.abs(diff)} points toward “${diff > 0 ? spectrum.right : spectrum.left}” compared with the hive.`;
   if (total <= 1) insight = 'You are the first in the hive today. Come back later and watch the crowd form.';
   else if (Math.abs(diff) < 5) insight = 'You are right in the middle of the hive.';
+
+  let rank: string | null = null;
+  if (total >= 3) {
+    const below = buckets.slice(0, myBucket).reduce((a, b) => a + b, 0);
+    const above = buckets.slice(myBucket + 1).reduce((a, b) => a + b, 0);
+    rank =
+      myGuess.opinion >= 50
+        ? `You lean further toward “${spectrum.right}” than ${Math.round((below / total) * 100)}% of the hive.`
+        : `You lean further toward “${spectrum.left}” than ${Math.round((above / total) * 100)}% of the hive.`;
+  }
 
   return (
     <>
@@ -31,8 +73,9 @@ export const Result = ({ state }: { state: StateResponse }) => {
       </div>
 
       <div className="hv-score">
-        <b>{score}</b>
+        <b>{shownScore}</b>
         <span>
+          <i className="hv-tier">{tierFor(score ?? 0)}</i>
           crowd-reading score
           <em>Live: moves as more players join</em>
         </span>
@@ -63,6 +106,7 @@ export const Result = ({ state }: { state: StateResponse }) => {
       </div>
 
       <p className="hv-insight">{insight}</p>
+      {rank && <p className="hv-rank">{rank}</p>}
 
       {yesterday && (
         <div className="hv-yday">

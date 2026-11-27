@@ -439,3 +439,21 @@ body {
   padding: 10px 16px;
   font-size: 14px;
 }
+
+.hv-tier {
+  display: block;
+  font-style: normal;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  color: var(--honey-soft);
+}
+.hv-rank {
+  margin: -6px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+@media (prefers-reduced-motion: reduce) {
+  .hv-bar {
+    animation: none;
+  }
+}
