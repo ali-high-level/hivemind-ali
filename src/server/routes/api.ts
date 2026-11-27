@@ -29,7 +29,7 @@ api.post('/guess', async (c) => {
   if (!postId) return c.json(fail('postId missing from context'), 400);
   if (!userId) return c.json(fail('Log in to play'), 401);
 
-  let body: Partial<GuessRequest> = {};
+  let body: Partial<GuessRequest>;
   try {
     body = await c.req.json<Partial<GuessRequest>>();
   } catch {
