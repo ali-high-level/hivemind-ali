@@ -1,27 +1,36 @@
-## Devvit React Starter
+# Hivemind
 
-A starter to build web applications on Reddit's developer platform
+A daily crowd-reading game for Reddit, built on Devvit Web for the Reddit Game of the Day Hackathon.
 
-- [Devvit](https://developers.reddit.com/): A way to build and deploy immersive games on Reddit
-- [Vite](https://vite.dev/): For compiling the webView
-- [React](https://react.dev/): For UI
-- [Hono](https://hono.dev/): For backend logic
-- [Tailwind](https://tailwindcss.com/): For styles
-- [TypeScript](https://www.typescriptlang.org/): For type safety
+## How to play
 
-## Getting Started
+Every day a new spectrum appears, for example "Pineapple on pizza: Crime against food <-> Culinary genius".
 
-> Make sure you have Node 22 downloaded on your machine before running!
+1. Your take: place the slider where you stand.
+2. Read the crowd: guess where the average of every other player will land.
+3. Reveal: see the live distribution of the whole community and your crowd-reading score.
 
-1. Run `npm create devvit@latest --template=react`
-2. Go through the installation wizard. You will need to create a Reddit account and connect it to Reddit developers
-3. Copy the command on the success page into your terminal
+The closer your guess is to the real crowd average, the higher your score: score = max(0, 100 - 2 x |guess - average|). Playing on consecutive days builds a streak.
 
-## Commands
+## Made by the community
 
-- `npm run dev`: Starts a development server where you can develop your application live on Reddit.
-- `npm run build`: Builds your client and server projects
-- `npm run deploy`: Uploads a new version of your app
-- `npm run launch`: Publishes your app for review
-- `npm run login`: Logs your CLI into Reddit
-- `npm run type-check`: Type checks, lints, and prettifies your app
+Every daily post includes a comment from the app explaining the format. Anyone can reply with one line:
+
+    Title | Left end | Right end
+
+When the next daily post is created, the app reads the previous post's comments, takes the top-voted valid reply, and uses it as the next spectrum with the author's username credited. If nobody suggests one, a built-in spectrum is used, so the game never runs out of content.
+
+Each result screen also shows "Yesterday's hive": the previous spectrum and where the community landed.
+
+## Tech
+
+- Devvit Web (React 19, Tailwind, Vite client)
+- Hono server routes, Redis for guesses, buckets, streaks and post numbering
+- A Devvit scheduler task creates a new daily post at 00:00 UTC
+- Player input is validated on the server (0-100 integers, one guess per user per post, link and length checks on suggested spectra)
+
+## Development
+
+    npm install
+    npm run dev      # playtest in the dev subreddit
+    npm run deploy   # type-check, lint, upload
