@@ -30,6 +30,11 @@ export const Splash = () => {
             <span>{state.spectrum.right}</span>
           </div>
         )}
+        {state && !played && (
+          <p className="hv-stats">
+            <b>{state.total}</b> {state.total === 1 ? 'player has' : 'players have'} placed a take so far
+          </p>
+        )}
         {played && (
           <p className="hv-stats">
             Score <b>{played.score}</b> · Streak <b>{played.streak.current}</b> ·{' '}
