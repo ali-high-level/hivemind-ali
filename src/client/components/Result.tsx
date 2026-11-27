@@ -1,8 +1,14 @@
 import type { CSSProperties } from 'react';
 import type { StateResponse } from '../../shared/api';
 
+const leaning = (mean: number, left: string, right: string) => {
+  if (mean >= 58) return `leaning “${right}”`;
+  if (mean <= 42) return `leaning “${left}”`;
+  return 'split right down the middle';
+};
+
 export const Result = ({ state }: { state: StateResponse }) => {
-  const { spectrum, buckets, total, mean, myGuess, score, streak } = state;
+  const { spectrum, buckets, total, mean, myGuess, score, streak, yesterday } = state;
   if (!myGuess || mean === null) return null;
 
   const max = Math.max(1, ...buckets);
@@ -55,6 +61,20 @@ export const Result = ({ state }: { state: StateResponse }) => {
       </div>
 
       <p className="hv-insight">{insight}</p>
+
+      {yesterday && (
+        <div className="hv-yday">
+          <p className="hv-kicker">Yesterday's hive</p>
+          <p className="hv-yq">{yesterday.title}</p>
+          <p className="hv-ya">
+            {yesterday.total} {yesterday.total === 1 ? 'player' : 'players'} landed at{' '}
+            <b>{Math.round(yesterday.mean)}</b>, {leaning(yesterday.mean, yesterday.left, yesterday.right)}.
+          </p>
+          <div className="hv-ytrack">
+            <span className="hv-ydot" style={{ left: `${yesterday.mean}%` }} />
+          </div>
+        </div>
+      )}
 
       <div className="hv-chips">
         <span className="hv-chip">

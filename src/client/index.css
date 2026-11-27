@@ -361,3 +361,51 @@ body {
 .hv-stats b {
   color: var(--honey);
 }
+
+.hv-splash .hv-btn {
+  flex: 0 0 auto;
+}
+
+.hv-splash .hv-btn {
+  flex: 0 0 auto;
+}
+
+.hv-yday {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(246, 183, 60, 0.06);
+}
+.hv-yday .hv-kicker {
+  margin-bottom: 6px;
+}
+.hv-yq {
+  margin: 0;
+  font-family: ui-serif, 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  font-size: 18px;
+  font-weight: 700;
+}
+.hv-ya {
+  margin: 4px 0 12px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.hv-ya b {
+  color: var(--honey);
+}
+.hv-ytrack {
+  position: relative;
+  height: 6px;
+  border-radius: 99px;
+  background: var(--line);
+}
+.hv-ydot {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--honey);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 10px rgba(246, 183, 60, 0.7);
+}
