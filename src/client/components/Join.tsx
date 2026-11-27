@@ -1,32 +1,13 @@
-import { useState } from 'react';
+import { context, navigateTo } from '@devvit/web/client';
 
 export const JoinButton = () => {
-  const [status, setStatus] = useState<'idle' | 'busy' | 'done' | 'error'>('idle');
-
-  const join = async () => {
-    setStatus('busy');
-    try {
-      const res = await fetch('/api/subscribe', { method: 'POST' });
-      setStatus(res.ok ? 'done' : 'error');
-    } catch {
-      setStatus('error');
-    }
-  };
-
-  const label =
-    status === 'done'
-      ? 'Joined'
-      : status === 'error'
-        ? 'Could not join, try again'
-        : 'Join this community for the daily hive';
-
+  const sub = context.subredditName ?? 'hivemind_ali_dev';
   return (
     <button
       className="hv-btn ghost hv-join"
-      onClick={() => void join()}
-      disabled={status === 'busy' || status === 'done'}
+      onClick={() => navigateTo(`https://www.reddit.com/r/${sub}`)}
     >
-      {label}
+      Join r/{sub} for the daily hive
     </button>
   );
 };

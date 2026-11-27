@@ -50,13 +50,3 @@ api.post('/guess', async (c) => {
     return c.json(fail('Could not save your guess'), 500);
   }
 });
-
-api.post('/subscribe', async (c) => {
-  try {
-    await reddit.subscribeToCurrentSubreddit();
-    return c.json({ status: 'ok' });
-  } catch (error) {
-    console.error(`subscribe error: ${error}`);
-    return c.json(fail('Could not join the community'), 500);
-  }
-});
