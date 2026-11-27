@@ -415,3 +415,20 @@ body {
   font-size: 12px;
   color: var(--honey-soft);
 }
+
+.hv-splash {
+  justify-content: center;
+  gap: 26px;
+}
+.hv-splash .hv-head {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  right: 18px;
+}
+.hv-splash .hv-q {
+  font-size: clamp(30px, 9vw, 44px);
+}
+.hv-splash .hv-btn {
+  align-self: stretch;
+}
