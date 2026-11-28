@@ -149,7 +149,7 @@ export const Result = ({ state }: { state: StateResponse }) => {
           <b>{streak.current}</b> day streak
         </span>
         <span className="hv-chip">Best {streak.best}</span>
-        <span className="hv-chip muted">Tomorrow is yours: reply on this post with Title | Left | Right</span>
+        <span className="hv-chip muted">Tomorrow is yours: comment a question like Tea or coffee: Tea vs Coffee</span>
       </div>
     </>
   );
