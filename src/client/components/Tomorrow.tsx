@@ -2,19 +2,32 @@ import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import type { StateResponse, Suggestion, SuggestionsResponse } from '../../shared/api';
 
+const SPLIT = /\s+(?:or|vs\.?|v\/s|ya)\s+/i;
+
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+const toSides = (text: string) => {
+  const parts = text
+    .trim()
+    .split(SPLIT)
+    .map((p) => p.trim().replace(/[?!.]+$/, ''));
+  if (parts.length !== 2) return null;
+  const [a, b] = parts;
+  if (!a || !b) return null;
+  return { title: `${cap(a)} or ${b}?`, left: cap(a), right: cap(b) };
+};
+
 export const Tomorrow = ({ state }: { state: StateResponse }) => {
   const [items, setItems] = useState<Suggestion[]>(state.suggestions);
   const [canSuggest, setCanSuggest] = useState(state.canSuggest);
   const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState('');
-  const [left, setLeft] = useState('');
-  const [right, setRight] = useState('');
+  const [choice, setChoice] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const titleRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (open) titleRef.current?.focus();
+    if (open) inputRef.current?.focus();
   }, [open]);
 
   const send = async (path: string, body: object): Promise<boolean> => {
@@ -51,12 +64,15 @@ export const Tomorrow = ({ state }: { state: StateResponse }) => {
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    void send('/api/suggest', { title, left, right }).then((ok) => {
+    const sides = toSides(choice);
+    if (!sides) {
+      setError('Write exactly two choices with "or" between them, like: Tea or coffee');
+      return;
+    }
+    void send('/api/suggest', sides).then((ok) => {
       if (ok) {
         setOpen(false);
-        setTitle('');
-        setLeft('');
-        setRight('');
+        setChoice('');
       }
     });
   };
@@ -94,35 +110,15 @@ export const Tomorrow = ({ state }: { state: StateResponse }) => {
       {open && (
         <form className="hv-tom-form" onSubmit={onSubmit}>
           <label>
-            Question
+            Two choices, with “or” between them
             <input
-              ref={titleRef}
-              value={title}
+              ref={inputRef}
+              value={choice}
               maxLength={60}
-              placeholder="e.g. Tea or coffee?"
-              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g. Tea or coffee"
+              onChange={(e) => setChoice(e.target.value)}
             />
           </label>
-          <div className="hv-tom-row">
-            <label>
-              Left side
-              <input
-                value={left}
-                maxLength={28}
-                placeholder="Tea"
-                onChange={(e) => setLeft(e.target.value)}
-              />
-            </label>
-            <label>
-              Right side
-              <input
-                value={right}
-                maxLength={28}
-                placeholder="Coffee"
-                onChange={(e) => setRight(e.target.value)}
-              />
-            </label>
-          </div>
           <div className="hv-actions">
             <button type="button" className="hv-btn ghost" onClick={() => setOpen(false)} disabled={busy}>
               Cancel
