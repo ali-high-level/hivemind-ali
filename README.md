@@ -16,7 +16,7 @@ The closer your guess is to the real crowd average, the higher your score: score
 
 Every daily post includes a comment from the app explaining the format. Anyone can reply with one line:
 
-    Title | Left end | Right end
+    Question: Left side vs Right side   (the older "Title | Left | Right" format also works)
 
 When the next daily post is created, the app reads the previous post's comments, takes the top-voted valid reply, and uses it as the next spectrum with the author's username credited. If nobody suggests one, a built-in spectrum is used, so the game never runs out of content.
 
