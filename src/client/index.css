@@ -457,3 +457,57 @@ body {
     animation: none;
   }
 }
+
+.hv-how {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.hv-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.hv-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.hv-step-n {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--honey);
+  background: rgba(246, 183, 60, 0.14);
+  color: var(--honey);
+  font-weight: 800;
+}
+.hv-step b {
+  display: block;
+  font-size: 16px;
+}
+.hv-step div span {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--muted);
+}
+.hv-how-mark {
+  display: none;
+}
+.hv-link {
+  align-self: flex-start;
+  margin-top: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--honey-soft);
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}

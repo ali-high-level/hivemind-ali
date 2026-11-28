@@ -7,6 +7,7 @@ import { useHive } from './hooks/useHive';
 import { Mark } from './components/Mark';
 import { SpectrumSlider } from './components/SpectrumSlider';
 import { Result } from './components/Result';
+import { HowItWorks } from './components/HowItWorks';
 
 const Shell = ({ children }: { children: ReactNode }) => (
   <div className="hv">
@@ -28,6 +29,7 @@ export const App = () => {
   const [step, setStep] = useState<'opinion' | 'predict'>('opinion');
   const [opinion, setOpinion] = useState(50);
   const [prediction, setPrediction] = useState(50);
+  const [how, setHow] = useState<'auto' | 'open' | 'closed'>('auto');
 
   if (!state) {
     return (
@@ -47,6 +49,14 @@ export const App = () => {
 
   const { spectrum } = state;
 
+  if (step === 'opinion' && (how === 'open' || (how === 'auto' && state.streak.best === 0))) {
+    return (
+      <Shell>
+        <HowItWorks onDone={() => setHow('closed')} />
+      </Shell>
+    );
+  }
+
   if (step === 'opinion') {
     return (
       <Shell>
@@ -55,6 +65,7 @@ export const App = () => {
           <h1 className="hv-q">{spectrum.title}</h1>
         {spectrum.by && <p className="hv-by">Spectrum by u/{spectrum.by}</p>}
           <p className="hv-sub">Drag to where you stand. Next, you will predict the crowd.</p>
+          <button className="hv-link" onClick={() => setHow('open')}>How it works</button>
         </div>
         <SpectrumSlider
           value={opinion}
