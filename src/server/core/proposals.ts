@@ -1,15 +1,27 @@
 import { reddit } from '@devvit/web/server';
 import type { Spectrum } from '../../shared/api';
 
-export const parseProposal = (raw: string) => {
+type Parsed = { title: string; left: string; right: string };
+
+const splitParts = (text: string): string[] | null => {
+  if (text.includes('|')) {
+    const parts = text.split('|').map((s) => s.trim());
+    return parts.length === 3 ? parts : null;
+  }
+  const m = /^(.+?):\s*(.+?)\s+vs\.?\s+(.+)$/i.exec(text);
+  if (!m) return null;
+  return [m[1] ?? '', m[2] ?? '', m[3] ?? ''].map((s) => s.trim());
+};
+
+export const parseProposal = (raw: string): Parsed | null => {
   const text = raw.trim();
   if (!text || text.includes('\n')) return null;
   const lower = text.toLowerCase();
   if (lower.includes('http') || lower.includes('www.') || lower.includes('u/') || lower.includes('r/')) {
     return null;
   }
-  const parts = text.split('|').map((s) => s.trim());
-  if (parts.length !== 3) return null;
+  const parts = splitParts(text);
+  if (!parts) return null;
   const [title, left, right] = parts;
   if (!title || !left || !right) return null;
   if (title.length < 4 || title.length > 60) return null;
@@ -41,13 +53,13 @@ export const findProposal = async (previousPostId: string): Promise<Spectrum | n
 };
 
 export const HOWTO_COMMENT = [
-  "**Write tomorrow's spectrum!**",
+  "**Write tomorrow's question!**",
   '',
-  'Reply to this post with ONE line in this exact format:',
+  'Reply to this post with ONE line like this:',
   '',
-  '`Title | Left end | Right end`',
+  '`Question: Left side vs Right side`',
   '',
-  'Example: `Morning showers | Ice cold | Scalding hot`',
+  'Example: `Morning showers: Ice cold vs Scalding hot`',
   '',
   'The top-voted valid reply becomes the next Hivemind, with your username credited.',
 ].join('\n');
