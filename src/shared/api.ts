@@ -19,6 +19,17 @@ export type Yesterday = {
   total: number;
 };
 
+export type Suggestion = {
+  id: string;
+  title: string;
+  left: string;
+  right: string;
+  by: string;
+  votes: number;
+  voted: boolean;
+  mine: boolean;
+};
+
 export type StateResponse = {
   type: 'state';
   postId: string;
@@ -31,11 +42,19 @@ export type StateResponse = {
   score: number | null;
   streak: { current: number; best: number };
   yesterday: Yesterday | null;
+  history: { n: number; score: number | null }[];
+  suggestions: Suggestion[];
+  canSuggest: boolean;
 };
 
 export type GuessRequest = {
   opinion: number;
   prediction: number;
+};
+
+export type SuggestionsResponse = {
+  suggestions: Suggestion[];
+  canSuggest: boolean;
 };
 
 export type ErrorResponse = {

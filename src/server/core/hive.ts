@@ -12,6 +12,7 @@ const key = {
   stats: (postId: string) => `hive:${postId}:stats`,
   streak: (userId: string) => `hive:user:${userId}:streak`,
   byNumber: 'hive:byNumber',
+  history: (userId: string) => `hive:user:${userId}:history`,
   custom: (postId: string) => `hive:${postId}:custom`,
 };
 
@@ -70,6 +71,29 @@ const bumpStreak = async (userId: string) => {
   });
 };
 
+const historyFor = async (userId: string) => {
+  const raw = await redis.hGetAll(key.history(userId));
+  const items: { postId: string; n: number; p: number }[] = [];
+  for (const [postId, value] of Object.entries(raw)) {
+    try {
+      const j = JSON.parse(value) as { n: number; p: number };
+      items.push({ postId, n: j.n, p: j.p });
+    } catch {
+      /* skip unreadable entries */
+    }
+  }
+  items.sort((a, b) => b.n - a.n);
+  const out = await Promise.all(
+    items.slice(0, 7).map(async (it) => {
+      const stats = await redis.hGetAll(key.stats(it.postId));
+      const count = Number(stats.n ?? 0);
+      const score = count > 0 ? scoreFor(it.p, Number(stats.sum ?? 0) / count) : null;
+      return { n: it.n, score };
+    })
+  );
+  return out.reverse();
+};
+
 const yesterdayFor = async (postId: string): Promise<Yesterday | null> => {
   const raw = await redis.get(key.number(postId));
   const num = Number(raw ?? NaN);
@@ -98,7 +122,7 @@ export const loadState = async (
   postId: string,
   userId: string | undefined,
   username: string
-): Promise<StateResponse> => {
+): Promise<Omit<StateResponse, 'suggestions' | 'canSuggest'>> => {
   const [spectrum, bucketHash, stats, rawGuess, streakHash, yesterday] = await Promise.all([
     spectrumFor(postId),
     redis.hGetAll(key.buckets(postId)),
@@ -107,6 +131,8 @@ export const loadState = async (
     userId ? redis.hGetAll(key.streak(userId)) : Promise.resolve({} as Record<string, string>),
     yesterdayFor(postId),
   ]);
+
+  const history = userId ? await historyFor(userId) : [];
 
   const buckets = Array.from({ length: BUCKETS }, (_, i) => Number(bucketHash[String(i)] ?? 0));
   const total = Number(stats.n ?? 0);
@@ -138,6 +164,7 @@ export const loadState = async (
       best: Number(streakHash.best ?? 0),
     },
     yesterday,
+    history,
   };
 };
 
@@ -160,4 +187,11 @@ export const submitGuess = async (
     redis.hIncrBy(key.stats(postId), 'sum', opinion),
   ]);
   await bumpStreak(userId);
+  const numberRaw = await redis.get(key.number(postId));
+  const postNumber = Number(numberRaw ?? NaN);
+  if (Number.isFinite(postNumber)) {
+    await redis.hSet(key.history(userId), {
+      [postId]: JSON.stringify({ n: postNumber, p: prediction }),
+    });
+  }
 };
