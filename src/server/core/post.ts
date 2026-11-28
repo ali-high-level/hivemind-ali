@@ -1,25 +1,30 @@
 import { reddit } from '@devvit/web/server';
+import type { Spectrum } from '../../shared/api';
 import { bindSpectrum, postIdByNumber, reserveSpectrum } from './hive';
 import { HOWTO_COMMENT, findProposal } from './proposals';
+import { topSuggestion } from './suggestions';
 
 export const createPost = async () => {
   const { index, number, spectrum: fallback } = await reserveSpectrum();
 
-  let proposal = null;
+  let chosen: Spectrum | null = null;
   if (number > 1) {
     try {
       const prevId = await postIdByNumber(number - 1);
-      if (prevId) proposal = await findProposal(prevId);
+      if (prevId) {
+        chosen = await topSuggestion(prevId);
+        if (!chosen) chosen = await findProposal(prevId);
+      }
     } catch (error) {
-      console.error(`Could not read proposals: ${error}`);
+      console.error(`Could not read suggestions: ${error}`);
     }
   }
 
-  const spectrum = proposal ?? fallback;
+  const spectrum = chosen ?? fallback;
   const post = await reddit.submitCustomPost({
     title: `Hivemind #${number}: ${spectrum.title}`,
   });
-  await bindSpectrum(post.id, index, number, proposal ?? undefined);
+  await bindSpectrum(post.id, index, number, chosen ?? undefined);
 
   try {
     await reddit.submitComment({ id: post.id, text: HOWTO_COMMENT });

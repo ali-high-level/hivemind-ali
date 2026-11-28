@@ -55,7 +55,7 @@ export const findProposal = async (previousPostId: string): Promise<Spectrum | n
 export const HOWTO_COMMENT = [
   "**Write tomorrow's question!**",
   '',
-  'Reply to this post with ONE line like this:',
+  "Open the game and tap Suggest yours on the result screen. Or reply here with ONE line like this:",
   '',
   '`Question: Left side vs Right side`',
   '',
