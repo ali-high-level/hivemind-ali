@@ -34,3 +34,7 @@ Each result screen also shows "Yesterday's hive": the previous spectrum and wher
     npm install
     npm run dev      # playtest in the dev subreddit
     npm run deploy   # type-check, lint, upload
+
+## Suggest and vote inside the game
+
+The result screen has a "Tomorrow's question" card. Players can vote for suggestions or send their own with three simple boxes (question, left side, right side). The top-voted suggestion becomes the next daily spectrum. If nobody suggests one, the app falls back to the top-voted valid Reddit comment, then to a built-in spectrum.
