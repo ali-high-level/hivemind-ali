@@ -11,3 +11,16 @@ export const JoinButton = () => {
     </button>
   );
 };
+
+export const SuggestButton = () => {
+  const id = context.postId?.replace(/^t3_/, '');
+  if (!id) return null;
+  return (
+    <button
+      className="hv-btn ghost hv-join"
+      onClick={() => navigateTo(`https://www.reddit.com/comments/${id}`)}
+    >
+      Suggest tomorrow’s spectrum
+    </button>
+  );
+};
