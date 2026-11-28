@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
 import type { StateResponse } from '../../shared/api';
-import { JoinButton, SuggestButton } from './Join';
+import { JoinButton } from './Join';
+import { Tomorrow } from './Tomorrow';
 
 const useCountUp = (target: number, ms = 900) => {
   const reduce =
@@ -139,17 +140,16 @@ export const Result = ({ state }: { state: StateResponse }) => {
         </div>
       )}
 
-      <div className="hv-cta">
-        <SuggestButton />
-        <JoinButton />
-      </div>
+      <Tomorrow state={state} />
+
+      <JoinButton />
 
       <div className="hv-chips">
         <span className="hv-chip">
           <b>{streak.current}</b> day streak
         </span>
         <span className="hv-chip">Best {streak.best}</span>
-        <span className="hv-chip muted">Tomorrow is yours: comment a question like Tea or coffee: Tea vs Coffee</span>
+        
       </div>
     </>
   );
