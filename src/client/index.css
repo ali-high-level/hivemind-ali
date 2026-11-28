@@ -511,3 +511,42 @@ body {
   text-decoration: underline;
   cursor: pointer;
 }
+
+.hv-hist {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.hv-hist .hv-kicker {
+  margin-bottom: 10px;
+}
+.hv-hist-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 84px;
+}
+.hv-hist-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+  font-size: 11px;
+  color: var(--muted);
+}
+.hv-hist-bar {
+  width: 100%;
+  max-width: 28px;
+  height: calc(var(--h) * 0.62);
+  border-radius: 4px 4px 0 0;
+  background: var(--honey);
+}
+
+.hv-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
