@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
 import type { StateResponse } from '../../shared/api';
-import { JoinButton } from './Join';
+import { JoinButton, SuggestButton } from './Join';
 
 const useCountUp = (target: number, ms = 900) => {
   const reduce =
@@ -40,7 +40,7 @@ const leaning = (mean: number, left: string, right: string) => {
 };
 
 export const Result = ({ state }: { state: StateResponse }) => {
-  const { spectrum, buckets, total, mean, myGuess, score, streak, yesterday } = state;
+  const { spectrum, buckets, total, mean, myGuess, score, streak, yesterday, history } = state;
   const shownScore = useCountUp(score ?? 0);
   if (!myGuess || mean === null) return null;
 
@@ -108,6 +108,23 @@ export const Result = ({ state }: { state: StateResponse }) => {
       <p className="hv-insight">{insight}</p>
       {rank && <p className="hv-rank">{rank}</p>}
 
+      {history.length > 1 && (
+        <div className="hv-hist">
+          <p className="hv-kicker">Your last {history.length} games</p>
+          <div className="hv-hist-bars">
+            {history.map((h) => (
+              <div className="hv-hist-col" key={h.n}>
+                <div
+                  className="hv-hist-bar"
+                  style={{ '--h': `${Math.max(h.score ?? 0, 4)}%` } as CSSProperties}
+                />
+                <span>{h.score ?? '-'}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {yesterday && (
         <div className="hv-yday">
           <p className="hv-kicker">Yesterday's hive</p>
@@ -122,7 +139,10 @@ export const Result = ({ state }: { state: StateResponse }) => {
         </div>
       )}
 
-      <JoinButton />
+      <div className="hv-cta">
+        <SuggestButton />
+        <JoinButton />
+      </div>
 
       <div className="hv-chips">
         <span className="hv-chip">
